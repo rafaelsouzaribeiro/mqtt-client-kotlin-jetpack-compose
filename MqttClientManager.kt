@@ -27,6 +27,8 @@ class MqttClientManager(
             val options = MqttConnectOptions()
             options.isAutomaticReconnect = true
             options.isCleanSession = false
+            options.userName="root"
+            options.password="123mudar".toCharArray()
             mqttClient.connect(options)
 
             mqttClient.setCallback(object : MqttCallback {
