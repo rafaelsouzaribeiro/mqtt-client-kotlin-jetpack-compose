@@ -20,9 +20,15 @@ class MainActivity : ComponentActivity() {
     private val mqttServerUri = "tcp://x.x.x.x:1883"
     private val mqttTopic = "topic/test"
     private lateinit var mqttClientManager: MqttClientManager
+    private var messageState by mutableStateOf("")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        mqttClientManager = MqttClientManager(mqttServerUri, mqttTopic) { message ->
+            messageState = message
+        }
+
         setContent {
             TestarTheme {
                 // A surface container using the 'background' color from the theme
@@ -30,12 +36,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val messageState = remember { mutableStateOf("") }
+                  
                     MqttView(messageState)
-                    mqttClientManager = MqttClientManager(mqttServerUri, mqttTopic) { message ->
-                        messageState.value = message
-                    }
-
                     mqttClientManager.publish("Nova mensagem")
                 }
 
@@ -45,13 +47,13 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun MqttView(messageState: MutableState<String>) {
+    fun MqttView(messageState: String) {
         Column {
             TopAppBar(title = { Text(text = "MQTT message") })
             Surface {
                 Column {
                     Text(text = "MESSSAGE:")
-                    Text(text = messageState.value)
+                    Text(text = messageState)
                 }
             }
         }
